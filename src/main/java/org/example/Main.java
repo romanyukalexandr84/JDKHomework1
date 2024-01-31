@@ -2,6 +2,8 @@ package org.example;
 
 public class Main {
     public static void main(String[] args) {
-        new Server();
+        Server server = new Server();
+        new Client(server, 700, 150);
+        new Client(server, 700, 500);
     }
 }

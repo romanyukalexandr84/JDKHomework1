@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Server extends JFrame {
-    private static final int POS_X = 400;
+    private static final int POS_X = 200;
     private static final int POS_Y = 350;
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
@@ -16,7 +16,7 @@ public class Server extends JFrame {
     private final JTextArea log = new JTextArea();
     private boolean isServerWorking;
 
-    Server() {
+    public Server() {
         isServerWorking = false;
         btnStart.addActionListener(new ActionListener() {
             @Override
