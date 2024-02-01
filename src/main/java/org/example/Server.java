@@ -10,16 +10,16 @@ import java.util.List;
 
 public class Server extends JFrame {
     private static final int POS_X = 200;
-    private static final int POS_Y = 350;
+    private static final int POS_Y = 150;
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
 
-    private final JButton btnStart = new JButton("Запустить сервер");
-    private final JButton btnStop = new JButton("Остановить сервер");
-    //private final JTextArea log = new JTextArea();
+    private JTextArea statusField;
+    private final JPanel mainPanel = new JPanel(new BorderLayout());
+    public final JButton btnStart = new JButton("Запустить сервер");
+    public final JButton btnStop = new JButton("Остановить сервер");
     public boolean isServerWorking;
-    public static File messagesLog = new File("./messages_log.txt");
-
+    public static File messagesLog = new File("./src/main/java/org/example/chat_log.txt");
 
     public Server() {
         isServerWorking = false;
@@ -27,14 +27,26 @@ public class Server extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 isServerWorking = true;
-                System.out.println("Сервер запущен");
+                statusField.setText("Сервер запущен");
+                String message = "Чат доступен\n";
+                for (Client client : Client.clients) {
+                    client.messagesField.append(message);
+                }
+                writeFile(readFile(messagesLog), messagesLog, message);
             }
         });
         btnStop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 isServerWorking = false;
-                System.out.println("Сервер остановлен");
+                statusField.setText("Сервер остановлен");
+                String message = "Чат временно недоступен из-за работ на сервере\n" +
+                        "Пользователи вышли из чата\n";
+                for (Client client : Client.clients) {
+                    client.isUserOnline = false;
+                    client.messagesField.append(message);
+                }
+                writeFile(readFile(messagesLog), messagesLog, message);
             }
         });
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -42,9 +54,13 @@ public class Server extends JFrame {
         setResizable(false);
         setTitle("Сервер чата");
         setAlwaysOnTop(true);
-        setLayout(new GridLayout(1, 2));
-        add(btnStart);
-        add(btnStop);
+        statusField = new JTextArea();
+        add(statusField, BorderLayout.SOUTH);
+
+        mainPanel.setLayout(new GridLayout(1, 2));
+        mainPanel.add(btnStart);
+        mainPanel.add(btnStop);
+        add(mainPanel);
 
         setVisible(true);
     }
