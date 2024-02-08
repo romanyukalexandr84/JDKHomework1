@@ -19,17 +19,19 @@ public class Server extends JFrame {
     public final JButton btnStart = new JButton("Запустить сервер");
     public final JButton btnStop = new JButton("Остановить сервер");
     public boolean isServerWorking;
-    public static File messagesLog = new File("./src/main/java/org/example/chat_log.txt");
+    public ArrayList<Client> clients;
+    public File messagesLog = new File("./src/main/java/org/example/chat_log.txt");
 
     public Server() {
         isServerWorking = false;
+        clients = new ArrayList<>();
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 isServerWorking = true;
                 statusField.setText("Сервер запущен");
                 String message = "Чат доступен\n";
-                for (Client client : Client.clients) {
+                for (Client client : clients) {
                     client.messagesField.append(message);
                 }
                 writeFile(readFile(messagesLog), messagesLog, message);
@@ -42,7 +44,7 @@ public class Server extends JFrame {
                 statusField.setText("Сервер остановлен");
                 String message = "Чат временно недоступен из-за работ на сервере\n" +
                         "Пользователи вышли из чата\n";
-                for (Client client : Client.clients) {
+                for (Client client : clients) {
                     client.isUserOnline = false;
                     client.messagesField.append(message);
                 }
@@ -66,7 +68,7 @@ public class Server extends JFrame {
     }
 
     //Метод чтения файла лога
-    public static List<String> readFile(File file) {
+    public List<String> readFile(File file) {
         List<String> lst = new ArrayList<>();
         try (FileReader fr = new FileReader(file); BufferedReader bf = new BufferedReader(fr)) {
             String line;
@@ -82,7 +84,7 @@ public class Server extends JFrame {
     }
 
     //Метод записи данных в файл лога
-    public static void writeFile(List<String> lst, File file, String message) {
+    public void writeFile(List<String> lst, File file, String message) {
         try (FileWriter fw = new FileWriter(file); BufferedWriter bf = new BufferedWriter(fw)) {
             for (String item : lst) {
                 bf.write(item);

@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static org.example.Server.readFile;
-
 public class Client extends JFrame {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 300;
@@ -29,14 +27,13 @@ public class Client extends JFrame {
 
     private Server server;
     public boolean isUserOnline;
-    JTextArea messagesField;
-    public static ArrayList<Client> clients = new ArrayList<>();
+    public JTextArea messagesField;
 
     public Client(Server server, int x, int y) {
         this.server = server;
         isUserOnline = false;
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBounds(x, y, WIDTH, HEIGHT);
         setTitle("Чат пользователя " + this.username);
 
@@ -63,7 +60,7 @@ public class Client extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 messagesField.setText(null);
-                for (String msg : readFile(Server.messagesLog)) {
+                for (String msg : server.readFile(server.messagesLog)) {
                     messagesField.append(msg + "\n");
                 }
             }
@@ -75,10 +72,10 @@ public class Client extends JFrame {
                 if (server.isServerWorking) {
                     isUserOnline = true;
                     String message = "Пользователь " + tfLogin.getText() + " онлайн" + "\n";
-                    for (Client client : clients) {
+                    for (Client client : server.clients) {
                         client.messagesField.append(message);
                     }
-                    Server.writeFile(readFile(Server.messagesLog), Server.messagesLog, message);
+                    server.writeFile(server.readFile(server.messagesLog), server.messagesLog, message);
                 }
             }
         });
@@ -89,10 +86,10 @@ public class Client extends JFrame {
                 if (server.isServerWorking) {
                     isUserOnline = false;
                     String message = "Пользователь " + tfLogin.getText() + " покинул чат" + "\n";
-                    for (Client client : clients) {
+                    for (Client client : server.clients) {
                         client.messagesField.append(message);
                     }
-                    Server.writeFile(readFile(Server.messagesLog), Server.messagesLog, message);
+                    server.writeFile(server.readFile(server.messagesLog), server.messagesLog, message);
                 }
             }
         });
@@ -102,21 +99,21 @@ public class Client extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (server.isServerWorking && isUserOnline) {
                     String message = tfLogin.getText() + ": " + tfMessage.getText();
-                    for (Client client : clients) {
+                    for (Client client : server.clients) {
                         client.messagesField.append(message + "\n");
                     }
-                    if (!Server.messagesLog.exists()) {
+                    if (!server.messagesLog.exists()) {
                         try {
-                            Server.messagesLog.createNewFile();
+                            server.messagesLog.createNewFile();
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
                     }
-                    Server.writeFile(readFile(Server.messagesLog), Server.messagesLog, message);
+                    server.writeFile(server.readFile(server.messagesLog), server.messagesLog, message);
                 }
             }
         });
-        clients.add(this);
+        server.clients.add(this);
     }
 
 }
